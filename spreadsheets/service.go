@@ -9,22 +9,22 @@ import (
 )
 
 type Service struct {
-	gservice *sheets.Service
+	gService *sheets.SpreadsheetsService
 }
 
 func NewService(jwt *jwt.Config) (*Service, error) {
 	ctx := context.Background()
 
-	googleSheetsService, err := sheets.NewService(ctx, goption.WithHTTPClient(jwt.Client(ctx)))
+	gService, err := sheets.NewService(ctx, goption.WithHTTPClient(jwt.Client(ctx)))
 	if err != nil {
 		return nil, err //nolint:wrapcheck
 	}
 
 	return &Service{
-		gservice: googleSheetsService,
+		gService: gService.Spreadsheets,
 	}, nil
 }
 
-func (s *Service) GetSpreadsheetsByID(id string) (*Spreadsheets, error) {
-	return NewSpreadsheets(s, id)
+func (s *Service) GetSpreadsheetByID(id string) (*Spreadsheet, error) {
+	return GetSpreadsheetsByID(s.gService, id)
 }

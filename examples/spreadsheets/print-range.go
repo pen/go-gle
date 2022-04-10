@@ -75,17 +75,17 @@ func getRangeValues(jsonKeyFile, ssID, title, rangeName string) ([][]interface{}
 		return nil, fmt.Errorf(`on NewSpreadsheetsService(): %w`, err)
 	}
 
-	sheets, err := service.GetSpreadsheetsByID(ssID)
+	spreadsheet, err := service.GetSpreadsheetByID(ssID)
 	if err != nil {
 		return nil, fmt.Errorf(`on GetSpreadsheetsByID(): %w`, err)
 	}
 
-	sheet, err := sheets.GetSpreadsheetByTitle(title)
+	sheet, err := spreadsheet.GetSheetByTitle(title)
 	if err != nil {
-		return nil, fmt.Errorf(`on GetSpreadsheetByTitle(): %w`, err)
+		return nil, fmt.Errorf(`on GetSpreadsheetByTitle("%s"): %w`, title, err)
 	}
 
-	range1, err := sheet.GetRange(rangeName)
+	range1, err := sheet.GetRangeByName(rangeName)
 	if err != nil {
 		return nil, fmt.Errorf(`on GetRange(): %w`, err)
 	}

@@ -11,7 +11,7 @@ import (
 )
 
 type Client struct {
-	gjc *jwt.Config
+	gJWTConfig *jwt.Config
 }
 
 func New(options ...option.Option) (*Client, error) {
@@ -40,10 +40,10 @@ func New(options ...option.Option) (*Client, error) {
 	}
 
 	return &Client{
-		gjc: jwtConfig,
+		gJWTConfig: jwtConfig,
 	}, nil
 }
 
 func (c *Client) NewSpreadsheetsService() (*spreadsheets.Service, error) {
-	return spreadsheets.NewService(c.gjc) //nolint:wrapcheck
+	return spreadsheets.NewService(c.gJWTConfig) //nolint:wrapcheck
 }

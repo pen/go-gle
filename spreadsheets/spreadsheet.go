@@ -1,17 +1,26 @@
 package spreadsheets
 
+import (
+	"google.golang.org/api/sheets/v4"
+)
+
 type Spreadsheet struct {
-	spreadSheets *Spreadsheets
-	title        string
+	gService     *sheets.SpreadsheetsService
+	gSpreadsheet *sheets.Spreadsheet
 }
 
-func NewSpreadsheet(s *Spreadsheets, title string) (*Spreadsheet, error) {
+func GetSpreadsheetsByID(gService *sheets.SpreadsheetsService, id string) (*Spreadsheet, error) {
+	gSpreadsheet, err := gService.Get(id).Do()
+	if err != nil {
+		return nil, err //nolint:wrapcheck
+	}
+
 	return &Spreadsheet{
-		spreadSheets: s,
-		title:        title,
+		gService:     gService,
+		gSpreadsheet: gSpreadsheet,
 	}, nil
 }
 
-func (s *Spreadsheet) GetRange(name string) (*Range, error) {
-	return NewRange(s, name)
+func (s *Spreadsheet) GetSheetByTitle(title string) (*Sheet, error) {
+	return GetSheetByTitle(s.gService, s.gSpreadsheet, title)
 }

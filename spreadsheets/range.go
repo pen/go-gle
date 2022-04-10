@@ -9,14 +9,21 @@ import (
 )
 
 type Range struct {
-	spreadSheet *Spreadsheet
-	name        string
+	gService      *sheets.SpreadsheetsService
+	spreadsheetID string
+	absName       string
 }
 
-func NewRange(s *Spreadsheet, name string) (*Range, error) {
+func GetRangeByName(
+	gService *sheets.SpreadsheetsService,
+	gSpreadsheet *sheets.Spreadsheet,
+	gSheet *sheets.Sheet,
+	name string,
+) (*Range, error) {
 	return &Range{
-		spreadSheet: s,
-		name:        rangeAbsName(s.title, name),
+		gService:      gService,
+		spreadsheetID: gSpreadsheet.SpreadsheetId,
+		absName:       rangeAbsName(gSheet.Properties.Title, name),
 	}, nil
 }
 
@@ -37,11 +44,8 @@ func rangeAbsName(title, name string) string {
 }
 
 func (r *Range) GetValues() ([][]interface{}, error) {
-	ss := r.spreadSheet.spreadSheets
-	gs := ss.service.gservice
-
-	value, err := gs.Spreadsheets.Values.
-		Get(ss.id, r.name).
+	value, err := r.gService.Values.
+		Get(r.spreadsheetID, r.absName).
 		Do()
 	if err != nil {
 		return nil, err //nolint:wrapcheck
@@ -55,13 +59,10 @@ func (r *Range) UpdateValues(values [][]interface{}, options ...option.Option) (
 		ValueInputOption: "USER_ENTERED",
 	})
 
-	ss := r.spreadSheet.spreadSheets
-	gs := ss.service.gservice
-
-	res, err := gs.Spreadsheets.Values.
+	res, err := r.gService.Values.
 		Update(
-			ss.id,
-			r.name,
+			r.spreadsheetID,
+			r.absName,
 			&sheets.ValueRange{Values: values},
 		).
 		ValueInputOption(opt.ValueInputOption).
@@ -74,13 +75,10 @@ func (r *Range) UpdateValues(values [][]interface{}, options ...option.Option) (
 }
 
 func (r *Range) ClearValues() (*sheets.ClearValuesResponse, error) {
-	ss := r.spreadSheet.spreadSheets
-	gs := ss.service.gservice
-
-	res, err := gs.Spreadsheets.Values.
+	res, err := r.gService.Values.
 		Clear(
-			ss.id,
-			r.name,
+			r.spreadsheetID,
+			r.absName,
 			&sheets.ClearValuesRequest{},
 		).
 		Do()
